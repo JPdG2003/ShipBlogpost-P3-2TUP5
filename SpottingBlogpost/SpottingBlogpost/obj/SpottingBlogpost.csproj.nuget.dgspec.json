@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\BLCanoe\\source\\repos\\SpottingBlogpost\\SpottingBlogpost\\SpottingBlogpost.csproj": {}
+    "C:\\Git stuff\\ShipBlogpost-P3-2TUP5\\SpottingBlogpost\\SpottingBlogpost\\SpottingBlogpost.csproj": {}
   },
   "projects": {
-    "C:\\Users\\BLCanoe\\source\\repos\\SpottingBlogpost\\SpottingBlogpost\\SpottingBlogpost.csproj": {
+    "C:\\Git stuff\\ShipBlogpost-P3-2TUP5\\SpottingBlogpost\\SpottingBlogpost\\SpottingBlogpost.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\BLCanoe\\source\\repos\\SpottingBlogpost\\SpottingBlogpost\\SpottingBlogpost.csproj",
+        "projectUniqueName": "C:\\Git stuff\\ShipBlogpost-P3-2TUP5\\SpottingBlogpost\\SpottingBlogpost\\SpottingBlogpost.csproj",
         "projectName": "SpottingBlogpost",
-        "projectPath": "C:\\Users\\BLCanoe\\source\\repos\\SpottingBlogpost\\SpottingBlogpost\\SpottingBlogpost.csproj",
+        "projectPath": "C:\\Git stuff\\ShipBlogpost-P3-2TUP5\\SpottingBlogpost\\SpottingBlogpost\\SpottingBlogpost.csproj",
         "packagesPath": "C:\\Users\\BLCanoe\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\BLCanoe\\source\\repos\\SpottingBlogpost\\SpottingBlogpost\\obj\\",
+        "outputPath": "C:\\Git stuff\\ShipBlogpost-P3-2TUP5\\SpottingBlogpost\\SpottingBlogpost\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\BLCanoe\\AppData\\Roaming\\NuGet\\NuGet.Config",

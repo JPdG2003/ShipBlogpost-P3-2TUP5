@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "WxjnLE2ysAbugVK+RrgW1y8ran75C12UJ7aPaB4Dw2AXw78tT8TIKFdKk5ofsT8NPP5ZvznMNauZ83b6wZRIAA==",
+  "dgSpecHash": "nBDnhQ9ptoLsbAqusVSgKgokQwTe4/IG+pDFEzGRjBodEqnGUEgtIrAyQmhYk6B8z8sjmCN8Yy6/AtJXm/vSTg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\BLCanoe\\source\\repos\\SpottingBlogpost\\SpottingBlogpost\\SpottingBlogpost.csproj",
+  "projectFilePath": "C:\\Git stuff\\ShipBlogpost-P3-2TUP5\\SpottingBlogpost\\SpottingBlogpost\\SpottingBlogpost.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\BLCanoe\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\BLCanoe\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\6.0.24\\microsoft.aspnetcore.authentication.jwtbearer.6.0.24.nupkg.sha512",

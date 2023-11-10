@@ -8,12 +8,13 @@ namespace SpottingBlogpost.Data.Entities
     {
         [Key]
         public int Id { get; set; }
+        [Required]
         public string Content { get; set; }
         public DateTime CommentDate { get; } = DateTime.Now.ToUniversalTime();
 
-
         [ForeignKey("ShipId")]
         public Ship CommentedShip { get; set; }
+        [Required]
         public int ShipId { get; set;}
 
 

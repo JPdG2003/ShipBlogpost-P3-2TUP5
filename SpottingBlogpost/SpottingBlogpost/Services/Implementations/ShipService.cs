@@ -33,15 +33,14 @@ namespace SpottingBlogpost.Services.Implementations
             return ship.Id;
         }
 
-        public void UpdateShip(Ship ship)
+        public void UpdateShip(Ship shipToUpdate)
         {
-            _context.Update(ship);
+            _context.Update(shipToUpdate);
             _context.SaveChanges();
         }
 
-        public void DeleteShip(int shipId)
+        public void DeleteShip(Ship shipToDelete)
         {
-            Ship? shipToDelete = _context.Ships.FirstOrDefault(s => s.Id == shipId);
             shipToDelete.IsDeleted = true;
             _context.Update(shipToDelete);
             _context.SaveChanges();
@@ -69,7 +68,7 @@ namespace SpottingBlogpost.Services.Implementations
                 .ToList();
         }
 
-        public List<Ship> GetAllShipsBySpotter (int spotterId)
+        public List<Ship> GetAllShipsBySpotterId (int spotterId)
         {
             return _context.Ships
                 .Where(s => s.SpotterId == spotterId)

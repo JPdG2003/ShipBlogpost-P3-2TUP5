@@ -9,10 +9,10 @@ namespace SpottingBlogpost.Services.Interfaces
         public Ship? GetShipById(int shipId);
         public int AddShip(Ship ship);
         public void UpdateShip(Ship ship);
-        public void DeleteShip(int shipId);
+        public void DeleteShip(Ship shipToDelete);
         public List<Ship> GetAllShipsByStatus(ShipStatus shipStatus);
         public List<Ship> GetAllShipsByType(ShipType shipType);
         public List<Ship> GetAllShipsByFlag(ShipFlag shipFlag);
-        public List<Ship> GetAllShipsBySpotter(int spotterId);
+        public List<Ship> GetAllShipsBySpotterId(int spotterId);
     }
 }
