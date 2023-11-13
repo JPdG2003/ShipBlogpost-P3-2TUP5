@@ -13,17 +13,22 @@ namespace SpottingBlogpost.Services.Implementations
             _context = context;
         }
 
+        public Comment? GetCommentById(int id) 
+        {
+            return _context.Comments.SingleOrDefault(c => c.Id == id && !c.IsDeleted);
+        }
+
         public List<Comment> GetAllCommentsByShipId(int shipId)
         {
             return _context.Comments
-                .Where(s => s.ShipId == shipId)
+                .Where(s => s.ShipId == shipId && !s.IsDeleted)
                 .ToList();
         }
 
         public List<Comment> GetAllCommentsByPoster(int posterId)
         {
             return _context.Comments
-                .Where(p => p.PosterId == posterId)
+                .Where(p => p.PosterId == posterId && !p.IsDeleted)
                 .ToList();
         }
 
@@ -34,9 +39,8 @@ namespace SpottingBlogpost.Services.Implementations
             return comment.Id;
         }
 
-        public void DeleteComment (int commentId)
+        public void DeleteComment (Comment commentToDelete)
         {
-            Comment? commentToDelete = _context.Comments.FirstOrDefault(c => c.Id == commentId);
             commentToDelete.IsDeleted = true;
             _context.Update(commentToDelete);
             _context.SaveChanges();

@@ -17,12 +17,41 @@ namespace SpottingBlogpost.Services.Implementations
 
         public List<Ship> GetAllShips()
         {
-            return _context.Ships.ToList();
+            return _context.Ships.Where(s => !s.IsDeleted).ToList();
         }
 
+
         public Ship? GetShipById(int shipId)
+        { 
+            return _context.Ships.SingleOrDefault(s => s.Id == shipId && !s.IsDeleted);
+        }
+
+        public List<Ship> GetAllShipsByType (ShipType shipType)
         {
-            return _context.Ships.SingleOrDefault(s => s.Id == shipId);
+            return _context.Ships
+                .Where(t => t.Type == shipType && !t.IsDeleted)
+                .ToList();
+
+        }
+
+        public List<Ship> GetAllShipsByFlag (ShipFlag shipFlag)
+        {
+            return _context.Ships
+                .Where (f => f.Flag == shipFlag && !f.IsDeleted)
+                .ToList();
+        }
+
+        public List<Ship> GetAllShipsByStatus (ShipStatus shipStatus)
+        {
+            return _context.Ships
+                .Where(s => s.Status == shipStatus && !s.IsDeleted)
+                .ToList();
+        }
+        public List<Ship> GetAllShipsBySpotterId (int spotterId)
+        {
+            return _context.Ships
+                .Where(s => s.SpotterId == spotterId && !s.IsDeleted)
+                .ToList();
         }
 
         public int AddShip(Ship ship)
@@ -46,33 +75,6 @@ namespace SpottingBlogpost.Services.Implementations
             _context.SaveChanges();
         }
 
-        public List<Ship> GetAllShipsByStatus (ShipStatus shipStatus)
-        {
-            return _context.Ships
-                .Where(s => s.Status == shipStatus)
-                .ToList();
-        }
 
-        public List<Ship> GetAllShipsByType (ShipType shipType)
-        {
-            return _context.Ships
-                .Where(t => t.Type == shipType)
-                .ToList();
-
-        }
-
-        public List<Ship> GetAllShipsByFlag (ShipFlag shipFlag)
-        {
-            return _context.Ships
-                .Where (f => f.Flag == shipFlag)
-                .ToList();
-        }
-
-        public List<Ship> GetAllShipsBySpotterId (int spotterId)
-        {
-            return _context.Ships
-                .Where(s => s.SpotterId == spotterId)
-                .ToList();
-        }
     }
 }

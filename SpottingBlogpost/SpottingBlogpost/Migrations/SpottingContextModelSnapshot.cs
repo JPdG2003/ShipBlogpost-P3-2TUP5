@@ -89,6 +89,9 @@ namespace SpottingBlogpost.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -100,9 +103,6 @@ namespace SpottingBlogpost.Migrations
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<bool>("State")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("UserType")
                         .IsRequired()

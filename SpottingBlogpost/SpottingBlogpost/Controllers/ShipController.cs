@@ -27,9 +27,39 @@ namespace SpottingBlogpost.Controllers
             return Ok(_shipService.GetAllShips());
         }
 
-        [HttpGet("{shipFlag}/filteredByFlag")]
+        #region ID Filters
+
+        [HttpGet("ships/{shipId}")]
         [Authorize]
-        public IActionResult GetShipsByFlag(ShipFlag shipFlag)
+        public IActionResult GetShipById(int shipId) 
+        {
+            var ship = _shipService.GetShipById(shipId);
+            if (ship == null)
+            {
+                return NotFound();
+            }
+            return Ok(ship);
+        }
+
+        [HttpGet("spotter/{spotterId}")]
+        [Authorize]
+        public IActionResult GetShipsBySpotterId(int spotterId)
+        {
+            var ships = _shipService.GetAllShipsBySpotterId(spotterId);
+            if (ships == null)
+            {
+                return NotFound();
+            }
+            return Ok(ships);
+        }
+
+        #endregion
+
+        #region Enum Filters
+
+        [HttpGet("flag/{shipFlag}")]
+        [Authorize]
+        public IActionResult GetShipsByFlag([FromRoute] ShipFlag shipFlag)
         {
             var ships = _shipService.GetAllShipsByFlag(shipFlag);
             if (ships == null)
@@ -39,9 +69,9 @@ namespace SpottingBlogpost.Controllers
             return Ok(ships);
         }
 
-        [HttpGet("{shipType}/filteredByType")]
+        [HttpGet("type/{shipType}")]
         [Authorize]
-        public IActionResult GetShipsByType(ShipType shipType)
+        public IActionResult GetShipsByType([FromRoute] ShipType shipType)
         {
             var ships = _shipService.GetAllShipsByType(shipType);
             if (ships == null)
@@ -51,50 +81,82 @@ namespace SpottingBlogpost.Controllers
             return Ok(ships);
         }
 
+        [HttpGet("status/{ShipStatus}")]
+        [Authorize]
+        public IActionResult GetShipsByStatus([FromRoute] ShipStatus shipStatus)
+        {
+            var ships = _shipService.GetAllShipsByStatus(shipStatus);
+            if (ships == null)
+            {
+                return NotFound();
+            }
+            return Ok(ships);
+        }
+
+        #endregion
+
         [HttpPost]
         [Authorize]
         public IActionResult AddShip([FromBody] ShipDto shipDto)
         {
-            var ship = new Ship()
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            
+            if (role == "Spotter") 
             {
-                Name = shipDto.Name,
-                Type = shipDto.Type,
-                Flag = shipDto.Flag,
-                SpotterId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value),
-            };
-            int id = _shipService.AddShip(ship);
-            return Ok(id);  
+                var ship = new Ship()
+                {
+                    Name = shipDto.Name,
+                    Type = shipDto.Type,
+                    Flag = shipDto.Flag,
+                    SpotterId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value),
+                };
+                int id = _shipService.AddShip(ship);
+                return Ok(id);
+            }
+            return Forbid();
                
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{shipId}")]
         [Authorize]
-        public IActionResult UpdateShip([FromRoute] int id, [FromBody] ShipUpdateDto shipUpdateDto) 
+        public IActionResult UpdateShip([FromRoute] int shipId, [FromBody] ShipUpdateDto shipUpdateDto)
         {
-            var ship = new Ship()
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            if (role == "Spotter") 
             {
-                Name = shipUpdateDto.Name,
-                Type = shipUpdateDto.Type,
-                Flag = shipUpdateDto.Flag,
-                Status = shipUpdateDto.Status,
-                SpotterId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value),
-            };
-            _shipService.UpdateShip(ship);
-            return Ok();
+                Ship shipToUpdate = _shipService.GetShipById(shipId);
+                if (shipToUpdate == null)
+                {
+                    return NotFound();
+                }
+                shipToUpdate.Name = shipUpdateDto.Name;
+                shipToUpdate.Type = shipUpdateDto.Type;
+                shipToUpdate.Flag = shipUpdateDto.Flag;
+                shipToUpdate.Status = shipUpdateDto.Status;
+
+                _shipService.UpdateShip(shipToUpdate);
+                return Ok();
+            }
+            return Forbid();
         }
 
         [HttpDelete]
         [Authorize]
         public IActionResult DeleteShip(int id)
         {
-            Ship shipToDelete = _shipService.GetShipById(id);
-            if (shipToDelete == null)
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            if (role == "Spotter")
             {
-                return NotFound();
-            }
-            _shipService.DeleteShip(shipToDelete);
+                Ship shipToDelete = _shipService.GetShipById(id);
+                if (shipToDelete == null)
+                {
+                    return NotFound();
+                }
+                _shipService.DeleteShip(shipToDelete);
 
-            return NoContent();
+                return NoContent();
+            }
+            return Forbid();
         }
     }
 }

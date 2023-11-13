@@ -28,7 +28,7 @@ namespace SpottingBlogpost.Controllers
             //Paso 1: Validamos las credenciales
             BaseResponse validarUsuarioResult = _userService.ValidarUsuario(credentialsDto.Email, credentialsDto.Password);
 
-            if (validarUsuarioResult.Message == "wrong email")
+            if (validarUsuarioResult.Message == "wrong email or deleted user")
             {
                 return BadRequest(validarUsuarioResult.Message);
             }

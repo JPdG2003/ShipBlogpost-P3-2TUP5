@@ -20,7 +20,7 @@ namespace SpottingBlogpost.Data.Entities
         [Required]
         public string Username { get; set; }
         public string UserType { get; set; }
-        public bool State { get; set; } = true;
+        public bool IsDeleted { get; set; } = false;
 
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 

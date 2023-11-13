@@ -39,20 +39,17 @@ namespace SpottingBlogpost.Controllers
         public IActionResult EditSpotter([FromBody] UserUpdateDto userUpdateDto)
         {
             string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            int id = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
 
             if (role == "Spotter")
             {
-                Spotter spotterToUpdate = new Spotter()
+                User userToUpdate = _userService.GetUserById(id);
                 {
-                    Id = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value),
-                    Email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value,
-                    Username = User.Claims.FirstOrDefault(c => c.Type.Contains("username")).Value,
-                    Name = userUpdateDto.Name,
-                    LastName = userUpdateDto.LastName,
-                    Password = userUpdateDto.Password,
-                    UserType = "Spotter",
+                    userToUpdate.Name = userUpdateDto.Name;
+                    userToUpdate.LastName = userUpdateDto.LastName;
+                    userToUpdate.Password = userUpdateDto.Password;
                 };
-                _userService.UpdateUser(spotterToUpdate);
+                _userService.UpdateUser(userToUpdate);
                 return Ok();
             }
             return Forbid();
@@ -61,8 +58,8 @@ namespace SpottingBlogpost.Controllers
         [HttpDelete]
         public IActionResult DeleteSpotter()
         {
-            int id = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
-            _userService.DeleteUser(id);
+            int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);;
+            _userService.DeleteUser(userId);
             return NoContent();
         }
     }

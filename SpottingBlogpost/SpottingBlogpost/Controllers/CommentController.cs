@@ -23,7 +23,7 @@ namespace SpottingBlogpost.Controllers
 
 
         [HttpPost]
-        public IActionResult PostComment(int shipId, [FromBody] CommentDto commentDto)
+        public IActionResult PostComment([FromRoute] int shipId, [FromBody] CommentDto commentDto)
         {
             var comment = new Comment()
             {
@@ -37,7 +37,7 @@ namespace SpottingBlogpost.Controllers
         }
 
         [HttpGet("{shipId}/filteredByShip")]
-        public IActionResult GetCommentsByShipId(int shipId)
+        public IActionResult GetCommentsByShipId([FromRoute] int shipId)
         {
            var comments = _commentService.GetAllCommentsByShipId(shipId);
             if (comments == null)
@@ -49,7 +49,7 @@ namespace SpottingBlogpost.Controllers
         }
 
         [HttpGet("{posterId}/filteredByUser")]
-        public IActionResult GetCommentsByPosterId(int posterId)
+        public IActionResult GetCommentsByPosterId([FromRoute] int posterId)
         {
             var comments = _commentService.GetAllCommentsByPoster(posterId);
             if (comments == null)
@@ -60,9 +60,14 @@ namespace SpottingBlogpost.Controllers
         }
 
         [HttpDelete]
-        public IActionResult DeleteComment(int id)
+        public IActionResult DeleteComment([FromRoute] int id)
         {
-            _commentService.DeleteComment(id);
+            var commentToDelete = _commentService.GetCommentById(id);
+            if (commentToDelete == null) 
+            {
+                return NotFound();
+            }
+            _commentService.DeleteComment(commentToDelete);
             return NoContent();
         }
     }

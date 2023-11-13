@@ -39,20 +39,17 @@ namespace SpottingBlogpost.Controllers
         public IActionResult EditMember([FromBody] UserUpdateDto userUpdateDto)
         {
             string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            int id = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
 
-            if (role == "Member") 
+            if (role == "Member")
             {
-                Member memberToUpdate = new Member()
+                User userToUpdate = _userService.GetUserById(id);
                 {
-                    Id = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value),
-                    Email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value,
-                    Username = User.Claims.FirstOrDefault(c => c.Type.Contains("username")).Value,
-                    Name = userUpdateDto.Name,
-                    LastName= userUpdateDto.LastName,
-                    Password = userUpdateDto.Password,
-                    UserType = "Member",
+                    userToUpdate.Name = userUpdateDto.Name;
+                    userToUpdate.LastName = userUpdateDto.LastName;
+                    userToUpdate.Password = userUpdateDto.Password;
                 };
-                _userService.UpdateUser(memberToUpdate);
+                _userService.UpdateUser(userToUpdate);
                 return Ok();
             }
             return Forbid();
@@ -62,8 +59,8 @@ namespace SpottingBlogpost.Controllers
         [Authorize]
         public IActionResult DeleteMember()
         {
-            int id = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
-            _userService.DeleteUser(id);
+            int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
+            _userService.DeleteUser(userId);
             return NoContent();
         }
 

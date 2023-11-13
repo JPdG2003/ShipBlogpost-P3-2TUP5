@@ -14,6 +14,11 @@ namespace SpottingBlogpost.Services.Implementations
             _context = context;
         }
 
+        public User? GetUserById(int userId)
+        {
+            return _context.Users.SingleOrDefault(u => u.Id == userId);
+        }
+
         public User? GetUserByEmail(string email)
         {
             return _context.Users.SingleOrDefault(u => u.Email == email);
@@ -23,7 +28,7 @@ namespace SpottingBlogpost.Services.Implementations
         {
             BaseResponse response = new BaseResponse();
             User? userForLogin = _context.Users.SingleOrDefault(u => u.Email == email);
-            if (userForLogin != null)
+            if (userForLogin != null && !userForLogin.IsDeleted)
             {
                 if (userForLogin.Password == password)
                 {
@@ -39,7 +44,7 @@ namespace SpottingBlogpost.Services.Implementations
             else
             {
                 response.Result = false;
-                response.Message = "wrong email";
+                response.Message = "wrong email or deleted user";
             }
             return response;
         }
@@ -51,16 +56,16 @@ namespace SpottingBlogpost.Services.Implementations
             return user.Id;
         }
 
-        public void UpdateUser(User user)
+        public void UpdateUser(User userToUpdate)
         {
-            _context.Update(user);
+            _context.Update(userToUpdate);
             _context.SaveChanges();
         }
 
         public void DeleteUser (int userId)
         {
             User userToDelete = _context.Users.FirstOrDefault(u => u.Id == userId);
-            userToDelete.State = false;
+            userToDelete.IsDeleted = true;
             _context.Update(userToDelete);
             _context.SaveChanges();
         }

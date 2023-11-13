@@ -10,8 +10,8 @@ using SpottingBlogpost.Data;
 namespace SpottingBlogpost.Migrations
 {
     [DbContext(typeof(SpottingContext))]
-    [Migration("20231109014147_test3")]
-    partial class test3
+    [Migration("20231113030549_userIsDeleted")]
+    partial class userIsDeleted
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -91,6 +91,9 @@ namespace SpottingBlogpost.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -102,9 +105,6 @@ namespace SpottingBlogpost.Migrations
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<bool>("State")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("UserType")
                         .IsRequired()
