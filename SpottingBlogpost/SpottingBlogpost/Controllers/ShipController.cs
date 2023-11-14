@@ -14,11 +14,9 @@ namespace SpottingBlogpost.Controllers
     public class ShipController : ControllerBase
     {
         private readonly IShipService _shipService;
-        private readonly IUserService _userService;
-        public ShipController (IShipService shipService, IUserService userService)
+        public ShipController (IShipService shipService)
         {
             _shipService = shipService;
-            _userService = userService;
         }
 
         [HttpGet]
@@ -140,14 +138,14 @@ namespace SpottingBlogpost.Controllers
             return Forbid();
         }
 
-        [HttpDelete]
+        [HttpDelete("{shipId}")]
         [Authorize]
-        public IActionResult DeleteShip(int id)
+        public IActionResult DeleteShip([FromRoute] int shipId)
         {
             string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
             if (role == "Spotter")
             {
-                Ship shipToDelete = _shipService.GetShipById(id);
+                Ship shipToDelete = _shipService.GetShipById(shipId);
                 if (shipToDelete == null)
                 {
                     return NotFound();

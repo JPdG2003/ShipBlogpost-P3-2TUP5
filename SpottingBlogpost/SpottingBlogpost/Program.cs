@@ -54,9 +54,13 @@ builder.Services.AddAuthentication("Bearer") //"Bearer" es el tipo de auntentica
     }
 );
 
+#region Dependency Injections
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IShipService, ShipService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
+
+#endregion
 
 var app = builder.Build();
 

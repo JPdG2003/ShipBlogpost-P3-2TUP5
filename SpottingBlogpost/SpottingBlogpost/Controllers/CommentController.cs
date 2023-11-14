@@ -14,11 +14,9 @@ namespace SpottingBlogpost.Controllers
     public class CommentController : ControllerBase
     {
         private readonly ICommentService _commentService;
-        private readonly IUserService _userService;
-        public CommentController(ICommentService commentService, IUserService userService)
+        public CommentController(ICommentService commentService)
         {
             _commentService = commentService;
-            _userService = userService;
         }
 
 
@@ -36,19 +34,19 @@ namespace SpottingBlogpost.Controllers
             return Ok(id);
         }
 
-        [HttpGet("{shipId}/filteredByShip")]
+        [HttpGet("shipComments/{shipId}")]
         public IActionResult GetCommentsByShipId([FromRoute] int shipId)
         {
-           var comments = _commentService.GetAllCommentsByShipId(shipId);
+            var comments = _commentService.GetAllCommentsByShipId(shipId);
             if (comments == null)
             {
                 return NotFound();
             }
             return Ok(comments);
-                
+
         }
 
-        [HttpGet("{posterId}/filteredByUser")]
+        [HttpGet("userComments/{shipId}")]
         public IActionResult GetCommentsByPosterId([FromRoute] int posterId)
         {
             var comments = _commentService.GetAllCommentsByPoster(posterId);
@@ -59,11 +57,11 @@ namespace SpottingBlogpost.Controllers
             return Ok(comments);
         }
 
-        [HttpDelete]
-        public IActionResult DeleteComment([FromRoute] int id)
+        [HttpDelete("{commentId}")]
+        public IActionResult DeleteComment([FromRoute] int commentId)
         {
-            var commentToDelete = _commentService.GetCommentById(id);
-            if (commentToDelete == null) 
+            var commentToDelete = _commentService.GetCommentById(commentId);
+            if (commentToDelete == null)
             {
                 return NotFound();
             }
