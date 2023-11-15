@@ -60,13 +60,18 @@ namespace SpottingBlogpost.Controllers
         [HttpDelete("{commentId}")]
         public IActionResult DeleteComment([FromRoute] int commentId)
         {
-            var commentToDelete = _commentService.GetCommentById(commentId);
-            if (commentToDelete == null)
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            if (role == "Spotter")
             {
-                return NotFound();
+                var commentToDelete = _commentService.GetCommentById(commentId);
+                if (commentToDelete == null)
+                {
+                    return NotFound();
+                }
+                _commentService.DeleteComment(commentToDelete);
+                return NoContent();
             }
-            _commentService.DeleteComment(commentToDelete);
-            return NoContent();
+            return Forbid();
         }
     }
 }
