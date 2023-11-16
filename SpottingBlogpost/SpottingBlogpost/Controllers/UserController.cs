@@ -19,6 +19,27 @@ namespace SpottingBlogpost.Controllers
             _userService = userService;
         }
 
+        [HttpGet("{userId}")]
+        public IActionResult GetUserById([FromRoute] int userId) 
+        {
+            var user = _userService.GetUserById(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return Ok(user);
+        }
+
+        [HttpGet("Myself")]
+        public IActionResult GetMyUser()
+        {
+            int id = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
+            var me = _userService.GetUserById(id);
+
+            return Ok(me);
+        }
+
+
         [HttpPut]
         public IActionResult EditUser([FromBody] UserUpdateDto userUpdateDto)
         {

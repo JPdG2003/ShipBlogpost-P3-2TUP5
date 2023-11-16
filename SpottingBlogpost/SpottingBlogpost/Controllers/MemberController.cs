@@ -18,6 +18,13 @@ namespace SpottingBlogpost.Controllers
             _userService = userService;
         }
 
+        [HttpGet("GetMembers")]
+        public IActionResult GetAllMembers() 
+        {
+            string userType = "Member";
+            return Ok(_userService.GetUsersByType(userType));
+        }
+
         [HttpPost]
         public IActionResult CreateMember([FromBody] UserPostDto userPostDto)
         {

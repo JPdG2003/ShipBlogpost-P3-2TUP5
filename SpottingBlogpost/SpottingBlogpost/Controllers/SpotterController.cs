@@ -19,6 +19,13 @@ namespace SpottingBlogpost.Controllers
             _userService = userService;
         }
 
+        [HttpGet("GetSpotters")]
+        public IActionResult GetAllSpotters()
+        {
+            string userType = "Spotter";
+            return Ok(_userService.GetUsersByType(userType));
+        }
+
         [HttpPost]
         public IActionResult CreateSpotter([FromBody] UserPostDto userPostDto)
         {

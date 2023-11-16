@@ -16,7 +16,12 @@ namespace SpottingBlogpost.Services.Implementations
 
         public User? GetUserById(int userId)
         {
-            return _context.Users.SingleOrDefault(u => u.Id == userId);
+            return _context.Users.SingleOrDefault(u => u.Id == userId && !u.IsDeleted);
+        }
+
+        public List<User> GetUsersByType(string userType) 
+        {
+            return _context.Users.Where(t =>  t.UserType == userType && !t.IsDeleted).ToList();
         }
 
         public User? GetUserByEmail(string email)

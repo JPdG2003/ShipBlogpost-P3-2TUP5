@@ -7,6 +7,7 @@ namespace SpottingBlogpost.Services.Interfaces
     {
         public BaseResponse ValidarUsuario(string username, string password);
         public User? GetUserById(int userId);
+        public List<User> GetUsersByType(string userType);
         public User? GetUserByEmail(string username);
         public int CreateUser(User user);
         public void UpdateUser(User userToUpdate);
