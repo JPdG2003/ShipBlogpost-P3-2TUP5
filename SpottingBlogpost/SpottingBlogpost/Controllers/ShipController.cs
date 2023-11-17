@@ -79,7 +79,7 @@ namespace SpottingBlogpost.Controllers
             return Ok(ships);
         }
 
-        [HttpGet("status/{ShipStatus}")]
+        [HttpGet("status/{shipStatus}")]
         [Authorize]
         public IActionResult GetShipsByStatus([FromRoute] ShipStatus shipStatus)
         {

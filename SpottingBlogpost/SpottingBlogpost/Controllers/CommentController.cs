@@ -20,7 +20,7 @@ namespace SpottingBlogpost.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost("{shipId}")]
         public IActionResult PostComment([FromRoute] int shipId, [FromBody] CommentDto commentDto)
         {
             var comment = new Comment()
@@ -46,7 +46,7 @@ namespace SpottingBlogpost.Controllers
 
         }
 
-        [HttpGet("userComments/{shipId}")]
+        [HttpGet("userComments/{posterId}")]
         public IActionResult GetCommentsByPosterId([FromRoute] int posterId)
         {
             var comments = _commentService.GetAllCommentsByPoster(posterId);
