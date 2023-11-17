@@ -38,7 +38,7 @@ namespace SpottingBlogpost.Controllers
         public IActionResult GetCommentsByShipId([FromRoute] int shipId)
         {
             var comments = _commentService.GetAllCommentsByShipId(shipId);
-            if (comments == null)
+            if (comments.Count == 0)
             {
                 return NotFound();
             }
@@ -50,7 +50,7 @@ namespace SpottingBlogpost.Controllers
         public IActionResult GetCommentsByPosterId([FromRoute] int posterId)
         {
             var comments = _commentService.GetAllCommentsByPoster(posterId);
-            if (comments == null)
+            if (comments.Count == 0)
             {
                 return NotFound();
             }

@@ -44,7 +44,7 @@ namespace SpottingBlogpost.Controllers
         public IActionResult GetShipsBySpotterId(int spotterId)
         {
             var ships = _shipService.GetAllShipsBySpotterId(spotterId);
-            if (ships == null)
+            if (ships.Count == 0)
             {
                 return NotFound();
             }
@@ -60,7 +60,7 @@ namespace SpottingBlogpost.Controllers
         public IActionResult GetShipsByFlag([FromRoute] ShipFlag shipFlag)
         {
             var ships = _shipService.GetAllShipsByFlag(shipFlag);
-            if (ships == null)
+            if (ships.Count == 0)
             {
                 return NotFound();
             }
@@ -72,7 +72,7 @@ namespace SpottingBlogpost.Controllers
         public IActionResult GetShipsByType([FromRoute] ShipType shipType)
         {
             var ships = _shipService.GetAllShipsByType(shipType);
-            if (ships == null)
+            if (ships.Count == 0)
             {
                 return NotFound();
             }
@@ -84,7 +84,7 @@ namespace SpottingBlogpost.Controllers
         public IActionResult GetShipsByStatus([FromRoute] ShipStatus shipStatus)
         {
             var ships = _shipService.GetAllShipsByStatus(shipStatus);
-            if (ships == null)
+            if (ships.Count == 0)
             {
                 return NotFound();
             }
