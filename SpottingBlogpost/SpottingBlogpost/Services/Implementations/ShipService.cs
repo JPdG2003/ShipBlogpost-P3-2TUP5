@@ -2,6 +2,7 @@
 using SpottingBlogpost.Data;
 using SpottingBlogpost.Data.Entities;
 using SpottingBlogpost.Data.Enum.Ship;
+using SpottingBlogpost.Data.Models;
 using SpottingBlogpost.Services.Interfaces;
 
 namespace SpottingBlogpost.Services.Implementations
@@ -125,6 +126,21 @@ namespace SpottingBlogpost.Services.Implementations
         {
             _context.Ships.Remove(shipToErase);
             _context.SaveChanges();
+        }
+
+        public bool ValidatePostEnum(ShipDto shipDto)
+        {
+            var result = false;
+            result = Enum.IsDefined(typeof(ShipFlag), shipDto.Flag) && Enum.IsDefined(typeof(ShipType), shipDto.Type);
+            return result;
+        }
+
+
+        public bool ValidateUpdateEnum(ShipUpdateDto shipUpdateDto)
+        {
+            var result = false;
+            result = Enum.IsDefined(typeof(ShipStatus), shipUpdateDto.Status) && Enum.IsDefined(typeof(ShipFlag), shipUpdateDto.Flag) && Enum.IsDefined(typeof(ShipType), shipUpdateDto.Type);
+            return result;
         }
     }
 }

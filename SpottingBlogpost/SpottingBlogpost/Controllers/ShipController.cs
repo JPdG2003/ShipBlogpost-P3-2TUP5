@@ -102,44 +102,54 @@ namespace SpottingBlogpost.Controllers
 
             if (role == "Spotter" || role == "Admin")
             {
-                var ship = new Ship()
+                bool validateEnum = _shipService.ValidatePostEnum(shipDto);
+                if (validateEnum)
                 {
-                    Name = shipDto.Name,
-                    Type = shipDto.Type,
-                    Flag = shipDto.Flag,
-                    SpotterId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value),
-                };
-                int id = _shipService.AddShip(ship);
-                return Ok(id);
+                    var ship = new Ship()
+                    {
+                        Name = shipDto.Name,
+                        Type = shipDto.Type,
+                        Flag = shipDto.Flag,
+                        SpotterId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value),
+                    };
+                    int id = _shipService.AddShip(ship);
+                    return Ok(id);
+                }
+                return BadRequest("Parameters are invalid");
             }
             return Forbid();
 
         }
 
-        [HttpPut("{shipId}")]
+        [HttpPut("UpdateShip/{shipId}")]
         [Authorize]
         public IActionResult UpdateShip([FromRoute] int shipId, [FromBody] ShipUpdateDto shipUpdateDto)
         {
             string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
             if (role == "Spotter" || role == "Admin")
             {
-                Ship shipToUpdate = _shipService.GetShipById(shipId);
-                if (shipToUpdate == null)
+                bool validateEnum = _shipService.ValidateUpdateEnum(shipUpdateDto);
+                if (validateEnum)
                 {
-                    return NotFound();
-                }
-                shipToUpdate.Name = shipUpdateDto.Name;
-                shipToUpdate.Type = shipUpdateDto.Type;
-                shipToUpdate.Flag = shipUpdateDto.Flag;
-                shipToUpdate.Status = shipUpdateDto.Status;
+                    Ship shipToUpdate = _shipService.GetShipById(shipId);
+                    if (shipToUpdate == null)
+                    {
+                        return NotFound();
+                    }
+                    shipToUpdate.Name = shipUpdateDto.Name;
+                    shipToUpdate.Type = shipUpdateDto.Type;
+                    shipToUpdate.Flag = shipUpdateDto.Flag;
+                    shipToUpdate.Status = shipUpdateDto.Status;
 
-                _shipService.UpdateShip(shipToUpdate);
-                return Ok();
+                    _shipService.UpdateShip(shipToUpdate);
+                    return Ok();
+                }
+                return BadRequest("Parameters are invalid");
             }
             return Forbid();
         }
 
-        [HttpDelete("{shipId}")]
+        [HttpDelete("DeleteShip/{shipId}")]
         [Authorize]
         public IActionResult DeleteShip([FromRoute] int shipId)
         {
@@ -158,7 +168,7 @@ namespace SpottingBlogpost.Controllers
             return Forbid();
         }
 
-        [HttpPatch("{shipId}")]
+        [HttpPatch("RestoreShip/{shipId}")]
         [Authorize]
         public IActionResult RestoreShip([FromRoute] int shipId)
         {

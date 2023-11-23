@@ -1,6 +1,8 @@
 ﻿using SpottingBlogpost.Data;
 using SpottingBlogpost.Data.Entities;
 using SpottingBlogpost.Data.Enum;
+using SpottingBlogpost.Data.Enum.Ship;
+using SpottingBlogpost.Data.Models;
 using SpottingBlogpost.Services.Interfaces;
 
 namespace SpottingBlogpost.Services.Implementations
@@ -81,6 +83,13 @@ namespace SpottingBlogpost.Services.Implementations
         {
             _context.Comments.Remove(commentToErase);
             _context.SaveChanges();
+        }
+
+        public bool ValidateEnum(CommentDto commentDto)
+        {
+            var result = false;
+            result = Enum.IsDefined(typeof(CommentType), commentDto.CommentType);
+            return result;
         }
     }
 }

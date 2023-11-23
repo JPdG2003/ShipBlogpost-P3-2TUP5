@@ -1,5 +1,6 @@
 ﻿using SpottingBlogpost.Data.Entities;
 using SpottingBlogpost.Data.Enum.Ship;
+using SpottingBlogpost.Data.Models;
 
 namespace SpottingBlogpost.Services.Interfaces
 {
@@ -20,5 +21,7 @@ namespace SpottingBlogpost.Services.Interfaces
         public void CascadeRestoreShip(Ship shipToRestore);
         public void EraseShips();
         public void EraseShip(Ship shipToErase);
+        public bool ValidatePostEnum(ShipDto shipDto);
+        public bool ValidateUpdateEnum(ShipUpdateDto shipUpdateDto);
     }
 }

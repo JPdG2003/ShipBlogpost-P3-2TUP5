@@ -23,23 +23,28 @@ namespace SpottingBlogpost.Controllers
         }
 
 
-        [HttpPost("{shipId}")]
+        [HttpPost("NewComment/{shipId}")]
         public IActionResult PostComment([FromRoute] int shipId, [FromBody] CommentDto commentDto)
         {
-            Ship shipToComment = _shipService.GetShipById(shipId);
-            if (shipToComment != null)
+            bool validateEnum = _commentService.ValidateEnum(commentDto);
+            if (validateEnum)
             {
-                var comment = new Comment()
+                Ship shipToComment = _shipService.GetShipById(shipId);
+                if (shipToComment != null)
                 {
-                    Content = commentDto.Content,
-                    CommentType = commentDto.CommentType,
-                    PosterId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value),
-                    ShipId = shipToComment.Id,
-                };
-                int id = _commentService.PostComment(comment);
-                return Ok(id);
+                    var comment = new Comment()
+                    {
+                        Content = commentDto.Content,
+                        CommentType = commentDto.CommentType,
+                        PosterId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value),
+                        ShipId = shipToComment.Id,
+                    };
+                    int id = _commentService.PostComment(comment);
+                    return Ok(id);
+                }
+                return NotFound();
             }
-            return NotFound();
+            return BadRequest("Parameter CommentType is invalid");
         }
 
         [HttpGet("ShipComments/{shipId}")]
@@ -51,7 +56,6 @@ namespace SpottingBlogpost.Controllers
                 return NotFound();
             }
             return Ok(comments);
-
         }
 
         [HttpGet("ShipComments/{shipId}/{commentType}")]

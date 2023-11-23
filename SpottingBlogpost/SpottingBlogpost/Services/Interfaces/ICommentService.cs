@@ -1,5 +1,6 @@
 ﻿using SpottingBlogpost.Data.Entities;
 using SpottingBlogpost.Data.Enum;
+using SpottingBlogpost.Data.Models;
 
 namespace SpottingBlogpost.Services.Interfaces
 {
@@ -15,6 +16,7 @@ namespace SpottingBlogpost.Services.Interfaces
         public void RestoreComment(Comment commentToRestore);
         public void EraseComments();
         public void EraseComment(Comment commentToErase);
+        public bool ValidateEnum(CommentDto commentDto);
 
     }
 }
