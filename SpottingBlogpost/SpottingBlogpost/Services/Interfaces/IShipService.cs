@@ -15,5 +15,10 @@ namespace SpottingBlogpost.Services.Interfaces
         public List<Ship> GetAllShipsByType(ShipType shipType);
         public List<Ship> GetAllShipsByFlag(ShipFlag shipFlag);
         public List<Ship> GetAllShipsBySpotterId(int spotterId);
+        public Ship? GetDeletedShipById(int shipId);
+        public void RestoreShip(Ship shipToRestore);
+        public void CascadeRestoreShip(Ship shipToRestore);
+        public void EraseShips();
+        public void EraseShip(Ship shipToErase);
     }
 }

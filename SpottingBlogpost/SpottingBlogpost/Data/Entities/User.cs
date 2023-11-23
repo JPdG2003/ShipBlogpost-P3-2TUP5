@@ -21,6 +21,7 @@ namespace SpottingBlogpost.Data.Entities
         public string Username { get; set; }
         public string UserType { get; set; }
         public bool IsDeleted { get; set; } = false;
+        public DateTime? DeleteTime { get; set; }
 
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 

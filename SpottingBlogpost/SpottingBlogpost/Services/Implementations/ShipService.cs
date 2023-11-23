@@ -9,10 +9,12 @@ namespace SpottingBlogpost.Services.Implementations
     public class ShipService : IShipService
     {
         private readonly SpottingContext _context;
+        private readonly ICommentService _commentService;
 
-        public ShipService(SpottingContext context)
+        public ShipService(SpottingContext context, ICommentService commentService)
         {
             _context = context;
+            _commentService = commentService;
         }
 
         public List<Ship> GetAllShips()
@@ -22,11 +24,11 @@ namespace SpottingBlogpost.Services.Implementations
 
 
         public Ship? GetShipById(int shipId)
-        { 
+        {
             return _context.Ships.SingleOrDefault(s => s.Id == shipId && !s.IsDeleted);
         }
 
-        public List<Ship> GetAllShipsByType (ShipType shipType)
+        public List<Ship> GetAllShipsByType(ShipType shipType)
         {
             return _context.Ships
                 .Where(t => t.Type == shipType && !t.IsDeleted)
@@ -34,20 +36,20 @@ namespace SpottingBlogpost.Services.Implementations
 
         }
 
-        public List<Ship> GetAllShipsByFlag (ShipFlag shipFlag)
+        public List<Ship> GetAllShipsByFlag(ShipFlag shipFlag)
         {
             return _context.Ships
-                .Where (f => f.Flag == shipFlag && !f.IsDeleted)
+                .Where(f => f.Flag == shipFlag && !f.IsDeleted)
                 .ToList();
         }
 
-        public List<Ship> GetAllShipsByStatus (ShipStatus shipStatus)
+        public List<Ship> GetAllShipsByStatus(ShipStatus shipStatus)
         {
             return _context.Ships
                 .Where(s => s.Status == shipStatus && !s.IsDeleted)
                 .ToList();
         }
-        public List<Ship> GetAllShipsBySpotterId (int spotterId)
+        public List<Ship> GetAllShipsBySpotterId(int spotterId)
         {
             return _context.Ships
                 .Where(s => s.SpotterId == spotterId && !s.IsDeleted)
@@ -71,10 +73,58 @@ namespace SpottingBlogpost.Services.Implementations
         public void DeleteShip(Ship shipToDelete)
         {
             shipToDelete.IsDeleted = true;
+            shipToDelete.DeleteTime = DateTime.UtcNow;
+            ICollection<Comment> commentsToCascadeDelete = _context.Comments.Where(c => c.ShipId == shipToDelete.Id && !c.IsDeleted && c != null).ToList();
+            foreach (Comment comment in commentsToCascadeDelete)
+            {
+                _commentService.DeleteComment(comment);
+            }
             _context.Update(shipToDelete);
             _context.SaveChanges();
         }
 
+        public Ship? GetDeletedShipById(int shipId)
+        {
+            return _context.Ships.SingleOrDefault(s => s.Id == shipId && s.IsDeleted);
+        }
 
+        public void RestoreShip(Ship shipToRestore)
+        {
+            shipToRestore.IsDeleted = false;
+            shipToRestore.DeleteTime = null;
+            _context.Update(shipToRestore);
+            _context.SaveChanges();
+        }
+
+        public void CascadeRestoreShip(Ship shipToRestore)
+        {
+
+            DateTime deletedTime = (DateTime)shipToRestore.DeleteTime;
+
+            RestoreShip(shipToRestore);
+
+            ICollection<Comment> commentsToCascadeRestore = _context.Comments.Where(c => c.ShipId == shipToRestore.Id && c.DeleteTime >= deletedTime && c != null).ToList();
+            foreach (Comment comment in commentsToCascadeRestore)
+            {
+                _commentService.RestoreComment(comment);
+            }
+        }
+
+        public void EraseShips()
+        {
+            DateTime filterTime = DateTime.UtcNow.AddMinutes(-30);
+            ICollection<Ship> shipsToErase = _context.Ships.Where(s => s.IsDeleted && s.DeleteTime <= filterTime).ToList();
+            foreach (Ship ship in shipsToErase)
+            {
+                _context.Ships.Remove(ship);
+                _context.SaveChanges();
+            }
+        }
+
+        public void EraseShip(Ship shipToErase)
+        {
+            _context.Ships.Remove(shipToErase);
+            _context.SaveChanges();
+        }
     }
 }

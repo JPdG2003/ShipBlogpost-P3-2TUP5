@@ -23,6 +23,7 @@ namespace SpottingBlogpost.Data.Entities
         public int PosterId { get; set;}
 
         public bool IsDeleted { get; set; } = false;
+        public DateTime? DeleteTime { get; set; }
 
         [Required]
         public CommentType CommentType { get; set;}

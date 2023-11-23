@@ -12,6 +12,7 @@ namespace SpottingBlogpost.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Member> Members { get; set; }
         public DbSet<Spotter> Spotters { get; set; }
+        public DbSet<Admin> Admins { get; set; }
         public DbSet<Ship> Ships { get; set; }
         public DbSet<Comment> Comments { get; set; }
 

@@ -8,10 +8,14 @@ namespace SpottingBlogpost.Services.Implementations
     public class UserService : IUserService
     {
         private readonly SpottingContext _context;
+        private readonly IShipService _shipService;
+        private readonly ICommentService _commentService;
 
-        public UserService(SpottingContext context)
+        public UserService(SpottingContext context, IShipService shipService, ICommentService commentService)
         {
             _context = context;
+            _shipService = shipService;
+            _commentService = commentService;
         }
 
         public User? GetUserById(int userId)
@@ -19,9 +23,9 @@ namespace SpottingBlogpost.Services.Implementations
             return _context.Users.SingleOrDefault(u => u.Id == userId && !u.IsDeleted);
         }
 
-        public List<User> GetUsersByType(string userType) 
+        public List<User> GetUsersByType(string userType)
         {
-            return _context.Users.Where(t =>  t.UserType == userType && !t.IsDeleted).ToList();
+            return _context.Users.Where(t => t.UserType == userType && !t.IsDeleted).ToList();
         }
 
         public User? GetUserByEmail(string email)
@@ -66,14 +70,80 @@ namespace SpottingBlogpost.Services.Implementations
             _context.Update(userToUpdate);
             _context.SaveChanges();
         }
-
-        public void DeleteUser (int userId)
+        public User? GetUserForDeletionById(int userId)
         {
-            User userToDelete = _context.Users.FirstOrDefault(u => u.Id == userId);
+            return _context.Users.SingleOrDefault(u => u.Id == userId && !u.IsDeleted && u.UserType != "Admin");
+        }
+
+        public void DeleteUser(User userToDelete)
+        {
             userToDelete.IsDeleted = true;
+            userToDelete.DeleteTime = DateTime.UtcNow;
+
+            ICollection<Comment> commentsToCascadeDelete = _context.Comments.Where(c => c.PosterId == userToDelete.Id && !c.IsDeleted && c != null).ToList();
+            foreach (Comment comment in commentsToCascadeDelete)
+            {
+                _commentService.DeleteComment(comment);
+            }
+
+            ICollection<Ship> shipsToCascadeDelete = _context.Ships.Where(s => s.SpotterId == userToDelete.Id && !s.IsDeleted && s != null).ToList();
+            foreach (Ship ship in shipsToCascadeDelete)
+            {
+                _shipService.DeleteShip(ship);
+            }
+
             _context.Update(userToDelete);
             _context.SaveChanges();
         }
 
+        public User? GetDeletedUserById(int userId)
+        {
+            return _context.Users.SingleOrDefault(u => u.Id == userId && u.IsDeleted);
+        }
+
+        public void RestoreUser(User userToRestore)
+        {
+            userToRestore.IsDeleted = false;
+            userToRestore.DeleteTime = null;
+            _context.Update(userToRestore);
+            _context.SaveChanges();
+        }
+
+        public void CascadeRestoreUser(User userToRestore)
+        {
+            DateTime deletedTime = (DateTime)userToRestore.DeleteTime;
+
+            RestoreUser(userToRestore);
+
+            ICollection<Comment> commentsToCascadeRestore = _context.Comments.Where(c => c.PosterId == userToRestore.Id && c.DeleteTime >= deletedTime && c != null).ToList();
+            foreach (Comment comment in commentsToCascadeRestore)
+            {
+                _commentService.RestoreComment(comment);
+            }
+
+            ICollection<Ship> shipsToCascadeRestore = _context.Ships.Where(s => s.SpotterId == userToRestore.Id && s.DeleteTime >= deletedTime && s != null).ToList();
+            foreach (Ship ship in shipsToCascadeRestore)
+            {
+                _shipService.CascadeRestoreShip(ship);
+            }
+
+        }
+
+        public void EraseUsers()
+        {
+            DateTime filterTime = DateTime.UtcNow.AddMinutes(-30);             
+            ICollection<User> usersToErase = _context.Users.Where(u => u.IsDeleted && u.DeleteTime <= filterTime).ToList();
+            foreach (User user in usersToErase)
+            {
+                _context.Users.Remove(user);
+                _context.SaveChanges();
+            }
+        }
+
+        public void EraseUser(User userToErase)
+        {
+            _context.Users.Remove(userToErase);
+            _context.SaveChanges();
+        }
     }
 }

@@ -29,17 +29,22 @@ namespace SpottingBlogpost.Controllers
         [HttpPost]
         public IActionResult CreateSpotter([FromBody] UserPostDto userPostDto)
         {
-            var spotter = new Spotter()
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            if (role == "Admin")
             {
-                Name = userPostDto.Name,
-                LastName = userPostDto.LastName,
-                Email = userPostDto.Email,
-                Password = userPostDto.Password,
-                Username = userPostDto.Username,
-                UserType = "Spotter"
-            };
-            int id = _userService.CreateUser(spotter);
-            return Ok(id);
+                var spotter = new Spotter()
+                {
+                    Name = userPostDto.Name,
+                    LastName = userPostDto.LastName,
+                    Email = userPostDto.Email,
+                    Password = userPostDto.Password,
+                    Username = userPostDto.Username,
+                    UserType = "Spotter"
+                };
+                int id = _userService.CreateUser(spotter);
+                return Ok(id);
+            }
+            return Forbid();
         }
     }
 }

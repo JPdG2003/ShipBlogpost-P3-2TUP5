@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SpottingBlogpost.Data.Entities;
 using SpottingBlogpost.Data.Enum.Ship;
 using SpottingBlogpost.Data.Models;
@@ -14,22 +15,22 @@ namespace SpottingBlogpost.Controllers
     public class ShipController : ControllerBase
     {
         private readonly IShipService _shipService;
-        public ShipController (IShipService shipService)
+        public ShipController(IShipService shipService)
         {
             _shipService = shipService;
         }
 
         [HttpGet]
-        public IActionResult GetAllShips() 
+        public IActionResult GetAllShips()
         {
             return Ok(_shipService.GetAllShips());
         }
 
         #region ID Filters
 
-        [HttpGet("ships/{shipId}")]
+        [HttpGet("Ships/{shipId}")]
         [Authorize]
-        public IActionResult GetShipById(int shipId) 
+        public IActionResult GetShipById(int shipId)
         {
             var ship = _shipService.GetShipById(shipId);
             if (ship == null)
@@ -39,7 +40,7 @@ namespace SpottingBlogpost.Controllers
             return Ok(ship);
         }
 
-        [HttpGet("spotter/{spotterId}")]
+        [HttpGet("Spotter/{spotterId}")]
         [Authorize]
         public IActionResult GetShipsBySpotterId(int spotterId)
         {
@@ -55,7 +56,7 @@ namespace SpottingBlogpost.Controllers
 
         #region Enum Filters
 
-        [HttpGet("flag/{shipFlag}")]
+        [HttpGet("Flag/{shipFlag}")]
         [Authorize]
         public IActionResult GetShipsByFlag([FromRoute] ShipFlag shipFlag)
         {
@@ -67,7 +68,7 @@ namespace SpottingBlogpost.Controllers
             return Ok(ships);
         }
 
-        [HttpGet("type/{shipType}")]
+        [HttpGet("Type/{shipType}")]
         [Authorize]
         public IActionResult GetShipsByType([FromRoute] ShipType shipType)
         {
@@ -79,7 +80,7 @@ namespace SpottingBlogpost.Controllers
             return Ok(ships);
         }
 
-        [HttpGet("status/{shipStatus}")]
+        [HttpGet("Status/{shipStatus}")]
         [Authorize]
         public IActionResult GetShipsByStatus([FromRoute] ShipStatus shipStatus)
         {
@@ -98,8 +99,8 @@ namespace SpottingBlogpost.Controllers
         public IActionResult AddShip([FromBody] ShipDto shipDto)
         {
             string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
-            
-            if (role == "Spotter") 
+
+            if (role == "Spotter" || role == "Admin")
             {
                 var ship = new Ship()
                 {
@@ -112,7 +113,7 @@ namespace SpottingBlogpost.Controllers
                 return Ok(id);
             }
             return Forbid();
-               
+
         }
 
         [HttpPut("{shipId}")]
@@ -120,7 +121,7 @@ namespace SpottingBlogpost.Controllers
         public IActionResult UpdateShip([FromRoute] int shipId, [FromBody] ShipUpdateDto shipUpdateDto)
         {
             string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
-            if (role == "Spotter") 
+            if (role == "Spotter" || role == "Admin")
             {
                 Ship shipToUpdate = _shipService.GetShipById(shipId);
                 if (shipToUpdate == null)
@@ -143,7 +144,7 @@ namespace SpottingBlogpost.Controllers
         public IActionResult DeleteShip([FromRoute] int shipId)
         {
             string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
-            if (role == "Spotter")
+            if (role == "Spotter" || role == "Admin")
             {
                 Ship shipToDelete = _shipService.GetShipById(shipId);
                 if (shipToDelete == null)
@@ -152,6 +153,57 @@ namespace SpottingBlogpost.Controllers
                 }
                 _shipService.DeleteShip(shipToDelete);
 
+                return NoContent();
+            }
+            return Forbid();
+        }
+
+        [HttpPatch("{shipId}")]
+        [Authorize]
+        public IActionResult RestoreShip([FromRoute] int shipId)
+        {
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            if (role == "Spotter" || role == "Admin")
+            {
+                Ship shipToRestore = _shipService.GetDeletedShipById(shipId);
+                if (shipToRestore == null)
+                {
+                    return NotFound();
+                }
+                _shipService.RestoreShip(shipToRestore);
+
+                return Ok("Ship restored");
+
+            }
+            return Forbid();
+        }
+
+        [HttpDelete("EraseDeletedShips")]
+        [Authorize]
+        public IActionResult EraseDeletedShips()
+        {
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            if (role == "Admin")
+            {
+                _shipService.EraseShips();
+                return NoContent();
+            }
+            return Forbid();
+        }
+
+        [HttpDelete("EraseDeletedShipById/{shipId}")]
+        [Authorize]
+        public IActionResult EraseDeletedShipById([FromRoute] int shipId)
+        {
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            if (role == "Admin")
+            {
+                Ship shipToErase = _shipService.GetDeletedShipById(shipId);
+                if (shipToErase == null)
+                {
+                    return NotFound();
+                }
+                _shipService.EraseShip(shipToErase);
                 return NoContent();
             }
             return Forbid();

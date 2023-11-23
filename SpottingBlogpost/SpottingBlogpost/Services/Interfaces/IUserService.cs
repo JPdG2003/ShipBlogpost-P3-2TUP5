@@ -11,6 +11,12 @@ namespace SpottingBlogpost.Services.Interfaces
         public User? GetUserByEmail(string username);
         public int CreateUser(User user);
         public void UpdateUser(User userToUpdate);
-        public void DeleteUser(int userId);
+        public User? GetUserForDeletionById(int userId);
+        public void DeleteUser(User userToDelete);
+        public User? GetDeletedUserById(int userId);
+        public void RestoreUser(User userToRestore);
+        public void CascadeRestoreUser(User userToRestore);
+        public void EraseUsers();
+        public void EraseUser(User userToErase);
     }
 }

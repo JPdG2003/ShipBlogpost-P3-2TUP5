@@ -20,6 +20,7 @@ namespace SpottingBlogpost.Data.Entities
         public Spotter Spotter { get; set; }
         public int SpotterId { get; set; }
         public bool IsDeleted { get; set; } = false;
+        public DateTime? DeleteTime { get; set; }
 
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
     }

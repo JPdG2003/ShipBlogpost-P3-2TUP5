@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SpottingBlogpost.Data.Entities;
+using SpottingBlogpost.Data.Enum;
 using SpottingBlogpost.Data.Models;
 using SpottingBlogpost.Services.Interfaces;
 using System.Security.Claims;
@@ -14,27 +15,34 @@ namespace SpottingBlogpost.Controllers
     public class CommentController : ControllerBase
     {
         private readonly ICommentService _commentService;
-        public CommentController(ICommentService commentService)
+        private readonly IShipService _shipService;
+        public CommentController(ICommentService commentService, IShipService shipService)
         {
             _commentService = commentService;
+            _shipService = shipService;
         }
 
 
         [HttpPost("{shipId}")]
         public IActionResult PostComment([FromRoute] int shipId, [FromBody] CommentDto commentDto)
         {
-            var comment = new Comment()
+            Ship shipToComment = _shipService.GetShipById(shipId);
+            if (shipToComment != null)
             {
-                Content = commentDto.Content,
-                CommentType = commentDto.CommentType,
-                PosterId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value),
-                ShipId = shipId,
-            };
-            int id = _commentService.PostComment(comment);
-            return Ok(id);
+                var comment = new Comment()
+                {
+                    Content = commentDto.Content,
+                    CommentType = commentDto.CommentType,
+                    PosterId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value),
+                    ShipId = shipToComment.Id,
+                };
+                int id = _commentService.PostComment(comment);
+                return Ok(id);
+            }
+            return NotFound();
         }
 
-        [HttpGet("shipComments/{shipId}")]
+        [HttpGet("ShipComments/{shipId}")]
         public IActionResult GetCommentsByShipId([FromRoute] int shipId)
         {
             var comments = _commentService.GetAllCommentsByShipId(shipId);
@@ -46,7 +54,18 @@ namespace SpottingBlogpost.Controllers
 
         }
 
-        [HttpGet("userComments/{posterId}")]
+        [HttpGet("ShipComments/{shipId}/{commentType}")]
+        public IActionResult GetCommentsPerShipByType([FromRoute] int shipId, CommentType commentType)
+        {
+            var comments = _commentService.GetAllCommentsPerShipByType(shipId, commentType);
+            if (comments.Count == 0)
+            {
+                return NotFound();
+            }
+            return Ok(comments);
+        }
+
+        [HttpGet("UserComments/{posterId}")]
         public IActionResult GetCommentsByPosterId([FromRoute] int posterId)
         {
             var comments = _commentService.GetAllCommentsByPoster(posterId);
@@ -57,11 +76,11 @@ namespace SpottingBlogpost.Controllers
             return Ok(comments);
         }
 
-        [HttpDelete("{commentId}")]
+        [HttpDelete("DeleteComment/{commentId}")]
         public IActionResult DeleteComment([FromRoute] int commentId)
         {
             string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
-            if (role == "Spotter")
+            if (role == "Spotter" || role == "Admin")
             {
                 var commentToDelete = _commentService.GetCommentById(commentId);
                 if (commentToDelete == null)
@@ -69,6 +88,52 @@ namespace SpottingBlogpost.Controllers
                     return NotFound();
                 }
                 _commentService.DeleteComment(commentToDelete);
+                return NoContent();
+            }
+            return Forbid();
+        }
+
+        [HttpPatch("RestoreComment/{commentId}")]
+        public IActionResult RestoreComment([FromRoute] int commentId)
+        {
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            if (role == "Spotter" || role == "Admin")
+            {
+                Comment commentToRestore = _commentService.GetDeletedCommentById(commentId);
+                if (commentToRestore == null)
+                {
+                    return NotFound();
+                }
+                _commentService.RestoreComment(commentToRestore);
+                return Ok("Comment restored");
+            }
+            return Forbid();
+        }
+
+        [HttpDelete("EraseDeletedComments")]
+        public IActionResult EraseDeletedComments()
+        {
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            if (role == "Admin")
+            {
+                _commentService.EraseComments();
+                return NoContent();
+            }
+            return Forbid();
+        }
+
+        [HttpDelete("EraseDeletedCommentById/{commentId}")]
+        public IActionResult EraseDeletedCommentById([FromRoute] int commentId)
+        {
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            if (role == "Admin")
+            {
+                Comment commentToErase = _commentService.GetDeletedCommentById(commentId);
+                if (commentToErase == null)
+                {
+                    return NotFound();
+                }
+                _commentService.EraseComment(commentToErase);
                 return NoContent();
             }
             return Forbid();
