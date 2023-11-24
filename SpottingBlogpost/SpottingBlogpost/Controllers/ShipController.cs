@@ -30,7 +30,7 @@ namespace SpottingBlogpost.Controllers
 
         [HttpGet("Ships/{shipId}")]
         [Authorize]
-        public IActionResult GetShipById(int shipId)
+        public IActionResult GetShipById([FromRoute] int shipId)
         {
             var ship = _shipService.GetShipById(shipId);
             if (ship == null)
@@ -42,7 +42,7 @@ namespace SpottingBlogpost.Controllers
 
         [HttpGet("Spotter/{spotterId}")]
         [Authorize]
-        public IActionResult GetShipsBySpotterId(int spotterId)
+        public IActionResult GetShipsBySpotterId([FromRoute] int spotterId)
         {
             var ships = _shipService.GetAllShipsBySpotterId(spotterId);
             if (ships.Count == 0)
