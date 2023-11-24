@@ -188,6 +188,26 @@ namespace SpottingBlogpost.Controllers
             return Forbid();
         }
 
+        [HttpPatch("RestoreShipCascade/{shipId}")]
+        [Authorize]
+        public IActionResult RestoreShipCascade([FromRoute] int shipId)
+        {
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            if (role == "Spotter" || role == "Admin")
+            {
+                Ship shipToRestore = _shipService.GetDeletedShipById(shipId);
+                if (shipToRestore == null)
+                {
+                    return NotFound();
+                }
+                _shipService.CascadeRestoreShip(shipToRestore);
+
+                return Ok("Ship restored");
+
+            }
+            return Forbid();
+        }
+
         [HttpDelete("EraseDeletedShips")]
         [Authorize]
         public IActionResult EraseDeletedShips()
